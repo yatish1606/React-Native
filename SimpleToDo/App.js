@@ -1,65 +1,89 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Dimensions, StatusBar, FlatList, TextInput, TouchableWithoutFeedback, } from 'react-native';
+import {Feather, FontAwesome5} from '@expo/vector-icons'
 
 const {width, height} = Dimensions.get('window')
 
-const array = []
+let array = []
+
+function Card (props) {
+  return (
+    <View style={{width:width, height:50, backgroundColor:'blue', flexDirection:'row'}}>
+      <View style={{width:'80%',height:'100%'}}>
+        <Text>{props.todo}</Text>
+        <Text>{props.id}</Text>
+      </View>
+      <TouchableWithoutFeedback onPress={()=>props.onDelete()}>
+        <View style={{height:'100%', width:'20%',backgroundColor:'pink', alignItems:'center', justifyContent:'center'}}>
+            <Feather name='trash-2' size={25} color='salmon' />
+        </View>
+      </TouchableWithoutFeedback>
+      
+    </View>
+  )
+}
 
 
-export default function App() {
+export default class  App extends React.Component {
 
-  const [KEY,SETKEY] = useState(0)
+  state = {
+    KEY:0,
+    todos : [],
+    text:''
+  }
+  
 
-  const [todos,setTodos] = useState([{
-    todo:'',
-    key:''
-  }])
+  handleSubmit () {
 
-
-  const [text,setText] = useState('')
-
-  function handleSubmit () {
-
-    // console.log(text)
-
-    // let newTodo = {todo : text, key : KEY}
-    
-    // setTodos([...todos, newTodo])
-
-    // SETKEY(KEY + 1)
-
-    // console.log(todos)
-
-    array.push({
-      todo:text,
-      key:KEY
+    // array.push({
+    //   todo:text,
+    //   id:KEY
+    // })
+    console.log('hi')
+    this.state.todos.push({
+      todo : this.state.text,
+      id : this.state.KEY
     })
 
-    SETKEY(KEY +1)
-
-    console.log(array)
+    this.setState({KEY: this.state.KEY +1, text: ''})
+    console.log(this.state.todos)
+    
+    
+    
   }
 
+  handleDelete (id) {
 
+    this.setState({
+      todos: this.state.todos.filter( (eachTodo) => {
+        return eachTodo.id !== id
+      })
+    })
 
-  return (
-    <View style={styles.container}>
-      <View style={{width:width, height:200, backgroundColor:'green', alignItems:'center', justifyContent:'space-around'}}>
-        <TextInput style={{borderWidth:1, borderRadius:10, width:'80%', height:35}} onChangeText={(text)=>setText(text)}/>
-        <TouchableWithoutFeedback onPress={handleSubmit}>
-          <View style={{width:60, height:60, borderRadius:30, backgroundColor:'salmon'}}>
+  }
 
-          </View>
-        </TouchableWithoutFeedback>
+  render () {
+    return (
+      <View style={styles.container}>
+        <View style={{width:width, height:150, backgroundColor:'green', alignItems:'center', justifyContent:'space-around'}}>
+          <TextInput style={{borderWidth:1, borderRadius:10, width:'80%', height:55, paddingBottom:20 }} onChangeText={(text)=>this.setState({text:text})} value={this.state.text}/>
+          <TouchableWithoutFeedback onPress={()=>this.handleSubmit()}>
+            <View style={{width:60, height:60, borderRadius:30, backgroundColor:'salmon', position:'absolute', top:80}}>
+  
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+        <View style={{width:width, height:'75%', backgroundColor:'gold'}}>
+          {
+            this.state.todos.map((item) => <Card todo={item.todo}  id={item.id} onDelete={()=>this.handleDelete(item.id)}/>)
+          }
+          
+        </View>
       </View>
-      <View style={{width:width, height:'75%', backgroundColor:'gold'}}>
-        {
-          array.map((todo) => <Text>{todo.todo}</Text>)
-        }
-        
-      </View>
-    </View>
-  );
+    );
+  }
+
+  
 }
 
 const styles = StyleSheet.create({
